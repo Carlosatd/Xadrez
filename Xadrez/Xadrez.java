@@ -1,4 +1,4 @@
-package Xadrez;
+package xadrez;
 import java.util.Scanner;
 import javax.swing.*;
 
@@ -27,19 +27,26 @@ public class Xadrez {
     //Usado para conferir se o rei está em xeque
     static int posicaoReiMaior, posicaoReiMenor;
     static int profMax=4;//(prfundidade maxima que vai descer na arvore)
-
+    static int corJogador = -1; // 1 para branco, 0 para preto
+    static int profundidade = 4;
     public static void main(String[] args) {
         Interface ui = new Interface();
-        System.out.println(alfaBeta(profMax, 100000,-100000,"",0));
-        
-        
+        //System.out.println(alfaBeta(profMax, 100000,-100000,"",0));       
         JFrame frame = new JFrame("Xadrez");
         frame.add(ui);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(512, 534);
+        frame.setSize(500, 500);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
+        Object [] jogador = {"Preto","Branco"};
+        corJogador = JOptionPane.showOptionDialog(null, "Escolha a sua cor", "Opções", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, jogador, jogador[1]);
+        if (corJogador==0) {
+            movimenta(alfaBeta(profundidade, 1000000, -1000000, "", 0));
+            flipBoard();
+            frame.repaint();
+        }
+    
     }
 
     public static String movimentosValidos() {
@@ -433,19 +440,38 @@ public class Xadrez {
         posicaoReiMaior = 63-posicaoReiMenor;
         posicaoReiMenor = 63-rei;
     }
-    public static int pontuacao(){
-        return 0;
-    }
+    
+    public static String sortMovimentos(String lista){
+        int[] pontos=new int [lista.length()/5];
+        for (int i=0;i<lista.length();i+=5) {
+            movimenta(lista.substring(i, i+5));
+            pontos[i/5]=-Pontuacao.pontuacao(-1, 0);
+            desfazMovimento(lista.substring(i, i+5));
+        }
+        String newListA="", newListB=lista;
+        for (int i=0;i<Math.min(6, lista.length()/5);i++) {//first few moves only
+            int max=-1000000, maxLocation=0;
+            for (int j=0;j<lista.length()/5;j++) {
+                if (pontos[j]>max) {max=pontos[j]; maxLocation=j;}
+            }
+            pontos[maxLocation]=-1000000;
+            newListA+=lista.substring(maxLocation*5,maxLocation*5+5);
+            newListB=newListB.replace(lista.substring(maxLocation*5,maxLocation*5+5), "");
+        }
+        return newListA+newListB;
+    };
+    
     
     public static String alfaBeta(int prof, int beta, int alfa, String jogada, int jogador){
         //tem que retornar a jogada e o score
         String list = movimentosValidos();
         if(prof == 0 || list.length()==0){
             //no caso, ou chegamos na raiz ou não temos mais movimentos(cheque)
-            return jogada+(pontuacao());//*(jogador*2-1)
+            return jogada+(Pontuacao.pontuacao(list.length(), prof*(jogador*(2-1))));//*(jogador*2-1)
         }
+        list=sortMovimentos(list);
         //criar uma ferramenta para organizar(mapa, talvez?)
-        jogador = 0-jogador;// ou 1 ou -1
+        jogador = 1-jogador;// ou 1 ou -1
         for (int i = 0; i < list.length(); i+=5) {
             movimenta(list.substring(i,i+5));
             flipBoard();
