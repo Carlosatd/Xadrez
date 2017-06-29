@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package xadrez;
-
 import java.awt.*;
 import java.awt.event.*;
 
@@ -19,14 +13,18 @@ public class Interface extends JPanel implements MouseListener, MouseMotionListe
 	static int mouseX, mouseY, novoMouseX, novoMouseY;
 
 	public void paintComponent(Graphics g){
-		for(int i=0; i<64; i+=2){
+            super.paintComponent(g);
+            this.setBackground(Color.yellow);
+            this.addMouseListener(this);
+            this.addMouseMotionListener(this);         
+            for(int i=0; i<64; i+=2){
 			g.setColor(new Color(255, 255, 255));
 			g.fillRect((i%8+(i/8)%2)*tamanhoCasa, (i/8)*tamanhoCasa, tamanhoCasa, tamanhoCasa);
 			g.setColor(new Color(100, 100, 100));
 			g.fillRect(((i+1)%8-((i+1)/8)%2)*tamanhoCasa, ((i+1)/8)*tamanhoCasa, tamanhoCasa, tamanhoCasa);
 		}
 		for(int i=0; i<64; i++){
-			switch (Main.TABULEIRO[i/8][i%8]) {
+			switch (Xadrez.TABULEIRO[i/8][i%8]) {
 	            case "P": 
 	            	Image peaoBranco;
 	            	peaoBranco = new ImageIcon("src/img/white_pawn.png").getImage();
@@ -90,8 +88,7 @@ public class Interface extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		
-		this.addMouseListener(this);
-		this.addMouseMotionListener(this);
+		
 	}
 
 	@Override
@@ -116,10 +113,10 @@ public class Interface extends JPanel implements MouseListener, MouseMotionListe
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getX()<8*tamanhoCasa &&e.getY()<8*tamanhoCasa) {
-            //if inside the board
-            mouseX=e.getX();
-            mouseY=e.getY();
-            repaint();
+                    //if inside the board
+                    mouseX=e.getX();
+                    mouseY=e.getY();
+                    repaint();
         }
 	}
 
@@ -130,20 +127,43 @@ public class Interface extends JPanel implements MouseListener, MouseMotionListe
             //Confere se está dentro do tabuleiro
             novoMouseX=e.getX();
             novoMouseY=e.getY();
-            String arrasto;
+            int chessBoard = 0;
+            if (e.getButton()==MouseEvent.BUTTON1) {
+                String dragMove;
+                if (novoMouseY/tamanhoCasa==0 && mouseY/tamanhoCasa==1 && "P".equals(Xadrez.TABULEIRO[mouseY/tamanhoCasa][mouseX/tamanhoCasa])) {
+                    //pawn promotion
+                    dragMove=""+mouseX/tamanhoCasa+novoMouseX/tamanhoCasa+Xadrez.TABULEIRO[novoMouseY/tamanhoCasa][novoMouseX/tamanhoCasa]+"QP";
+                } else {
+                    //regular move
+                    dragMove=""+mouseY/tamanhoCasa+mouseX/tamanhoCasa+novoMouseY/tamanhoCasa+novoMouseX/tamanhoCasa+Xadrez.TABULEIRO[novoMouseY/tamanhoCasa][novoMouseX/tamanhoCasa];
+                }
+                String userPosibilities=Xadrez.movimentosValidos();
+                if (userPosibilities.replaceAll(dragMove, "").length()<userPosibilities.length()) {
+                    //if valid move
+                    Xadrez.movimenta(dragMove);
+                    Xadrez.flipBoard();
+                    Xadrez.movimenta(Xadrez.alfaBeta(Xadrez.profundidade, 1000000, -1000000, "", 0));
+                    Xadrez.flipBoard();
+                    repaint();
+                }
+            }
+            
+            
+            
+           // String arrasto;
             //if (novoMouseY/tamanhoCasa==0 && mouseY/tamanhoCasa==1 && "P".equals(Main.TABULEIRO[mouseY/tamanhoCasa][mouseX/tamanhoCasa])) {
                 //Promove peão
             	//arrasto=""+mouseX/tamanhoCasa+novoMouseX/tamanhoCasa+Main.TABULEIRO[novoMouseY/tamanhoCasa][novoMouseX/tamanhoCasa]+"QP";
             //} else {
                 //regular move
-            	arrasto=""+mouseY/tamanhoCasa+mouseX/tamanhoCasa+novoMouseY/tamanhoCasa+novoMouseX/tamanhoCasa+Main.TABULEIRO[novoMouseY/tamanhoCasa][novoMouseX/tamanhoCasa];
+            //	arrasto=""+mouseY/tamanhoCasa+mouseX/tamanhoCasa+novoMouseY/tamanhoCasa+novoMouseX/tamanhoCasa+Xadrez.TABULEIRO[novoMouseY/tamanhoCasa][novoMouseX/tamanhoCasa];
             //}
             //String posibilidades=Main.movimentosValidos();
             //if (posibilidades.replaceAll(arrasto, "").length()<posibilidades.length()) {
                 //Movimento válido
-                Main.movimenta(arrasto);
+             //   Xadrez.movimenta(arrasto);
             //}
-            repaint();
+           // repaint();
         }
 	}
 
