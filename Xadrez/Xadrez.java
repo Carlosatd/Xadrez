@@ -60,9 +60,9 @@ public class Xadrez {
             flipBoard();
             frame.repaint();
         }
-        for (int i=0;i<8;i++) {
-            System.out.println(Arrays.toString(TABULEIRO[i]));
-        }
+        //for (int i=0;i<8;i++) {
+        //    System.out.println(Arrays.toString(TABULEIRO[i]));
+        //}
         
         
     }

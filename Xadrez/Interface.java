@@ -142,7 +142,7 @@ public class Interface extends JPanel implements MouseListener, MouseMotionListe
                     //if valid move
                     Xadrez.movimenta(dragMove);
                     Xadrez.flipBoard();
-                    Xadrez.movimenta(Xadrez.alfaBeta(Xadrez.profundidade, 1000000, -1000000, "", 0));
+                    Xadrez.movimenta(Xadrez.alfaBeta(Xadrez.profMax, 1000000, -1000000, "", 0));
                     Xadrez.flipBoard();
                     repaint();
                 }
