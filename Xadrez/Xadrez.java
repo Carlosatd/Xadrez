@@ -1,4 +1,5 @@
 package xadrez;
+import java.util.Arrays;
 import java.util.Scanner;
 import javax.swing.*;
 
@@ -7,12 +8,20 @@ public class Xadrez {
     /*
 		Usando notação algébrica em inglês para definir a posição inicial do tabuleiro
 		Letras minúsculas indicam peças pretas e maiúsculas, brancas
-		K = King
-		Q = Queen
-		N = Knight
-		B = Bishop
-		R = Rook
-		P = Pawn
+		K = King = 9
+		Q = Queen = 8
+		N = Knight = 7
+		B = Bishop = 6
+		R = Rook = 5
+		P = Pawn = 1
+    {0,0,0,0,0,0,0,0}
+    {-1,-1,-1,-1,-1,-1,-1,-1}
+    {0,0,0,0,0,0,0,0}
+    {0,0,0,0,0,0,0,0}
+    {0,0,0,0,0,0,0,0}
+    {0,0,0,0,0,0,0,0}
+    {1,1,1,1,1,1,1,1}
+    {0,0,0,0,0,0,0,0}
      */
     static String TABULEIRO[][] = {
         {"r", "n", "b", "q", "k", "b", "n", "r"},
@@ -28,25 +37,34 @@ public class Xadrez {
     static int posicaoReiMaior, posicaoReiMenor;
     static int profMax=4;//(prfundidade maxima que vai descer na arvore)
     static int corJogador = -1; // 1 para branco, 0 para preto
-    static int profundidade = 4;
+    //static int profundidade = 4;
     public static void main(String[] args) {
-        Interface ui = new Interface();
+        while (!"K".equals(TABULEIRO[posicaoReiMaior/8][posicaoReiMaior%8])) {posicaoReiMaior++;}//get King's location
+        while (!"k".equals(TABULEIRO[posicaoReiMenor/8][posicaoReiMenor%8])) {posicaoReiMenor++;}//get king's location
+        
+        
         //System.out.println(alfaBeta(profMax, 100000,-100000,"",0));       
         JFrame frame = new JFrame("Xadrez");
-        frame.add(ui);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
+        Interface ui = new Interface();
+        frame.add(ui);
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(534, 522);
         frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
+        frame.setResizable(true);
         frame.setVisible(true);
         Object [] jogador = {"Preto","Branco"};
         corJogador = JOptionPane.showOptionDialog(null, "Escolha a sua cor", "Opções", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, jogador, jogador[1]);
         if (corJogador==0) {
-            movimenta(alfaBeta(profundidade, 1000000, -1000000, "", 0));
+            movimenta(alfaBeta(profMax, 1000000, -1000000, "", 0));
             flipBoard();
             frame.repaint();
         }
-    
+        for (int i=0;i<8;i++) {
+            System.out.println(Arrays.toString(TABULEIRO[i]));
+        }
+        
+        
     }
 
     public static String movimentosValidos() {
@@ -429,7 +447,7 @@ public class Xadrez {
             } else{
                 temp = TABULEIRO[L][c].toUpperCase();
             }
-            if(Character.isUpperCase(TABULEIRO[L][c].charAt(0))){
+            if(Character.isUpperCase(TABULEIRO[7-L][7-c].charAt(0))){
                 TABULEIRO[L][c] = TABULEIRO[7-L][7-c].toLowerCase();
             } else{
                 TABULEIRO[L][c] = TABULEIRO[7-L][7-c].toUpperCase();
